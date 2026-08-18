@@ -1,0 +1,27 @@
+# Build artifacts
+build/
+.si/
+
+# macOS
+.DS_Store
+
+# Xcode
+*.xcodeproj
+*.xcworkspace
+.build/
+
+# Swift PM
+.build/
+*.resolved
+
+# Generated
+*.o
+*.a
+*.dylib
+*.so
+
+# Scripts
+clone-deps.sh
+
+# Internal docs (not for repo)
+*.md

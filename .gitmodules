@@ -1,0 +1,270 @@
+[submodule "swift/boringssl"]
+	path = swift/boringssl
+	url = https://github.com/google/boringssl.git
+	shallow = true
+
+[submodule "swift/brotli"]
+	path = swift/brotli
+	url = https://github.com/google/brotli.git
+	shallow = true
+
+[submodule "swift/cmark"]
+	path = swift/cmark
+	url = https://github.com/swiftlang/swift-cmark.git
+	shallow = true
+
+[submodule "swift/curl"]
+	path = swift/curl
+	url = https://github.com/curl/curl.git
+	shallow = true
+
+[submodule "swift/indexstore-db"]
+	path = swift/indexstore-db
+	url = https://github.com/swiftlang/indexstore-db.git
+	shallow = true
+
+[submodule "swift/libxml2"]
+	path = swift/libxml2
+	url = https://github.com/gnome/libxml2.git
+	shallow = true
+
+[submodule "swift/llbuild"]
+	path = swift/llbuild
+	url = https://github.com/swiftlang/swift-llbuild.git
+	shallow = true
+
+[submodule "swift/llvm-project"]
+	path = swift/llvm-project
+	url = https://github.com/swiftlang/llvm-project.git
+	shallow = true
+
+[submodule "swift/ninja"]
+	path = swift/ninja
+	url = https://github.com/ninja-build/ninja.git
+	shallow = true
+
+[submodule "swift/sourcekit-lsp"]
+	path = swift/sourcekit-lsp
+	url = https://github.com/swiftlang/sourcekit-lsp.git
+	shallow = true
+
+[submodule "swift/swift"]
+	path = swift/swift
+	url = https://github.com/swiftlang/swift.git
+	shallow = true
+
+[submodule "swift/swift-argument-parser"]
+	path = swift/swift-argument-parser
+	url = https://github.com/apple/swift-argument-parser.git
+	shallow = true
+
+[submodule "swift/swift-asn1"]
+	path = swift/swift-asn1
+	url = https://github.com/apple/swift-asn1.git
+	shallow = true
+
+[submodule "swift/swift-async-algorithms"]
+	path = swift/swift-async-algorithms
+	url = https://github.com/apple/swift-async-algorithms.git
+	shallow = true
+
+[submodule "swift/swift-atomics"]
+	path = swift/swift-atomics
+	url = https://github.com/apple/swift-atomics.git
+	shallow = true
+
+[submodule "swift/swift-build"]
+	path = swift/swift-build
+	url = https://github.com/swiftlang/swift-build.git
+	shallow = true
+
+[submodule "swift/swift-certificates"]
+	path = swift/swift-certificates
+	url = https://github.com/apple/swift-certificates.git
+	shallow = true
+
+[submodule "swift/swift-collections"]
+	path = swift/swift-collections
+	url = https://github.com/apple/swift-collections.git
+	shallow = true
+
+[submodule "swift/swift-corelibs-blocksruntime"]
+	path = swift/swift-corelibs-blocksruntime
+	url = https://github.com/swiftlang/swift-corelibs-blocksruntime.git
+	shallow = true
+
+[submodule "swift/swift-corelibs-foundation"]
+	path = swift/swift-corelibs-foundation
+	url = https://github.com/swiftlang/swift-corelibs-foundation.git
+	shallow = true
+
+[submodule "swift/swift-corelibs-libdispatch"]
+	path = swift/swift-corelibs-libdispatch
+	url = https://github.com/swiftlang/swift-corelibs-libdispatch.git
+	shallow = true
+
+[submodule "swift/swift-corelibs-xctest"]
+	path = swift/swift-corelibs-xctest
+	url = https://github.com/swiftlang/swift-corelibs-xctest.git
+	shallow = true
+
+[submodule "swift/swift-crypto"]
+	path = swift/swift-crypto
+	url = https://github.com/apple/swift-crypto.git
+	shallow = true
+
+[submodule "swift/swift-docc"]
+	path = swift/swift-docc
+	url = https://github.com/swiftlang/swift-docc.git
+	shallow = true
+
+[submodule "swift/swift-docc-render-artifact"]
+	path = swift/swift-docc-render-artifact
+	url = https://github.com/swiftlang/swift-docc-render-artifact.git
+	shallow = true
+
+[submodule "swift/swift-docc-symbolkit"]
+	path = swift/swift-docc-symbolkit
+	url = https://github.com/swiftlang/swift-docc-symbolkit.git
+	shallow = true
+
+[submodule "swift/swift-driver"]
+	path = swift/swift-driver
+	url = https://github.com/swiftlang/swift-driver.git
+	shallow = true
+
+[submodule "swift/swift-experimental-string-processing"]
+	path = swift/swift-experimental-string-processing
+	url = https://github.com/swiftlang/swift-experimental-string-processing.git
+	shallow = true
+
+[submodule "swift/swift-format"]
+	path = swift/swift-format
+	url = https://github.com/swiftlang/swift-format.git
+	shallow = true
+
+[submodule "swift/swift-foundation"]
+	path = swift/swift-foundation
+	url = https://github.com/swiftlang/swift-foundation.git
+	shallow = true
+
+[submodule "swift/swift-foundation-icu"]
+	path = swift/swift-foundation-icu
+	url = https://github.com/swiftlang/swift-foundation-icu.git
+	shallow = true
+
+[submodule "swift/swift-installer-scripts"]
+	path = swift/swift-installer-scripts
+	url = https://github.com/swiftlang/swift-installer-scripts.git
+	shallow = true
+
+[submodule "swift/swift-integration-tests"]
+	path = swift/swift-integration-tests
+	url = https://github.com/swiftlang/swift-integration-tests.git
+	shallow = true
+
+[submodule "swift/swift-llvm-bindings"]
+	path = swift/swift-llvm-bindings
+	url = https://github.com/swiftlang/swift-llvm-bindings.git
+	shallow = true
+
+[submodule "swift/swift-lmdb"]
+	path = swift/swift-lmdb
+	url = https://github.com/swiftlang/swift-lmdb.git
+	shallow = true
+
+[submodule "swift/swift-log"]
+	path = swift/swift-log
+	url = https://github.com/apple/swift-log.git
+	shallow = true
+
+[submodule "swift/swift-markdown"]
+	path = swift/swift-markdown
+	url = https://github.com/swiftlang/swift-markdown.git
+	shallow = true
+
+[submodule "swift/swift-nio"]
+	path = swift/swift-nio
+	url = https://github.com/apple/swift-nio.git
+	shallow = true
+
+[submodule "swift/swift-numerics"]
+	path = swift/swift-numerics
+	url = https://github.com/apple/swift-numerics.git
+	shallow = true
+
+[submodule "swift/swift-sdk-generator"]
+	path = swift/swift-sdk-generator
+	url = https://github.com/swiftlang/swift-sdk-generator.git
+	shallow = true
+
+[submodule "swift/swift-stress-tester"]
+	path = swift/swift-stress-tester
+	url = https://github.com/swiftlang/swift-stress-tester.git
+	shallow = true
+
+[submodule "swift/swift-subprocess"]
+	path = swift/swift-subprocess
+	url = https://github.com/swiftlang/swift-subprocess.git
+	shallow = true
+
+[submodule "swift/swift-syntax"]
+	path = swift/swift-syntax
+	url = https://github.com/swiftlang/swift-syntax.git
+	shallow = true
+
+[submodule "swift/swift-system"]
+	path = swift/swift-system
+	url = https://github.com/apple/swift-system.git
+	shallow = true
+
+[submodule "swift/swift-testing"]
+	path = swift/swift-testing
+	url = https://github.com/swiftlang/swift-testing.git
+	shallow = true
+
+[submodule "swift/swift-toolchain-sqlite"]
+	path = swift/swift-toolchain-sqlite
+	url = https://github.com/swiftlang/swift-toolchain-sqlite.git
+	shallow = true
+
+[submodule "swift/swift-tools-protocols"]
+	path = swift/swift-tools-protocols
+	url = https://github.com/swiftlang/swift-tools-protocols.git
+	shallow = true
+
+[submodule "swift/swift-tools-support-core"]
+	path = swift/swift-tools-support-core
+	url = https://github.com/swiftlang/swift-tools-support-core.git
+	shallow = true
+
+[submodule "swift/swift-xcode-playground-support"]
+	path = swift/swift-xcode-playground-support
+	url = https://github.com/apple/swift-xcode-playground-support.git
+	shallow = true
+
+[submodule "swift/swiftpm"]
+	path = swift/swiftpm
+	url = https://github.com/swiftlang/swift-package-manager.git
+	shallow = true
+
+[submodule "swift/wasi-libc"]
+	path = swift/wasi-libc
+	url = https://github.com/WebAssembly/wasi-libc.git
+	shallow = true
+
+[submodule "swift/wasmkit"]
+	path = swift/wasmkit
+	url = https://github.com/swiftwasm/WasmKit.git
+	shallow = true
+
+[submodule "swift/yams"]
+	path = swift/yams
+	url = https://github.com/jpsim/Yams.git
+	shallow = true
+
+[submodule "swift/zlib"]
+	path = swift/zlib
+	url = https://github.com/madler/zlib.git
+	shallow = true
+
