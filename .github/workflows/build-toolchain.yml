@@ -1,0 +1,344 @@
+name: Build Swift Toolchain
+
+on:
+  push:
+    paths:
+      - '.gitmodules'
+      - '.github/workflows/build-toolchain.yml'
+  workflow_dispatch:
+
+# Only one toolchain build at a time — no point running two in parallel
+concurrency:
+  group: toolchain-build
+  cancel-in-progress: false
+
+env:
+  BUILD_DIR: ${{ github.workspace }}/build
+  # Identifies the pinned snapshot — all cache keys derived from this
+  SWIFT_SHA: ${{ github.sha }}
+
+jobs:
+
+  # ─────────────────────────────────────────────────────────────────
+  # Job 1a — Build LLVM + Clang
+  # Triggers only when llvm-project submodule SHA changes
+  # ─────────────────────────────────────────────────────────────────
+  build-llvm:
+    name: Build LLVM
+    runs-on: ubuntu-22.04-32-core
+    timeout-minutes: 180
+
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+
+    steps:
+      - name: Checkout si repo
+        uses: actions/checkout@v4
+        with:
+          submodules: false  # we init only what we need per job
+
+      - name: Init llvm-project + swift submodules only
+        run: |
+          git submodule update --init --depth 1 swift/llvm-project
+          git submodule update --init --depth 1 swift/swift
+          git submodule update --init --depth 1 swift/swift-llvm-bindings
+
+      - name: Compute cache key
+        id: cache-key
+        run: |
+          LLVM_SHA=$(git -C swift/llvm-project rev-parse HEAD)
+          echo "key=llvm-linux-x64-${LLVM_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Restore LLVM build cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: build/llvm-linux-x86_64/
+          key: ${{ steps.cache-key.outputs.key }}
+
+      - name: Install build dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends 
+            ninja-build cmake python3 python3-pip 
+            clang lld 
+            libxml2-dev libsqlite3-dev 
+            swig libpython3-dev libncurses-dev
+
+      - name: Build LLVM
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          swift/swift/utils/build-script 
+            --bootstrapping=hosttools 
+            --build-ninja 
+            --release 
+            --skip-build-benchmarks 
+            --only-execute linux-x86_64-llvm-build 
+            --build-dir "$BUILD_DIR"
+
+      - name: Upload LLVM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: llvm-linux-x64
+          path: build/llvm-linux-x86_64/
+          retention-days: 7
+          if-no-files-found: error
+
+  # ─────────────────────────────────────────────────────────────────
+  # Job 1b — Build cmark (tiny, ~2 min)
+  # ─────────────────────────────────────────────────────────────────
+  build-cmark:
+    name: Build cmark
+    runs-on: ubuntu-22.04-4-core
+    timeout-minutes: 15
+
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+
+    steps:
+      - name: Checkout si repo
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Init cmark + swift submodules
+        run: |
+          git submodule update --init --depth 1 swift/cmark
+          git submodule update --init --depth 1 swift/swift
+
+      - name: Compute cache key
+        id: cache-key
+        run: |
+          CMARK_SHA=$(git -C swift/cmark rev-parse HEAD)
+          echo "key=cmark-linux-x64-${CMARK_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Restore cmark build cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: build/cmark-linux-x86_64/
+          key: ${{ steps.cache-key.outputs.key }}
+
+      - name: Install build dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends ninja-build cmake python3
+
+      - name: Build cmark
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          swift/swift/utils/build-script 
+            --bootstrapping=hosttools 
+            --build-ninja 
+            --release 
+            --only-execute linux-x86_64-cmark-build 
+            --build-dir "$BUILD_DIR"
+
+      - name: Upload cmark artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cmark-linux-x64
+          path: build/cmark-linux-x86_64/
+          retention-days: 7
+          if-no-files-found: error
+
+  # ─────────────────────────────────────────────────────────────────
+  # Job 1c — Build swift-syntax (SPM package, fast)
+  # ─────────────────────────────────────────────────────────────────
+  build-swift-syntax:
+    name: Build swift-syntax
+    runs-on: ubuntu-22.04-4-core
+    timeout-minutes: 30
+
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+
+    steps:
+      - name: Checkout si repo
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Init swift-syntax submodule
+        run: git submodule update --init --depth 1 swift/swift-syntax
+
+      - name: Compute cache key
+        id: cache-key
+        run: |
+          SYNTAX_SHA=$(git -C swift/swift-syntax rev-parse HEAD)
+          echo "key=swift-syntax-linux-x64-${SYNTAX_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Restore swift-syntax build cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: build/swift-linux-x86_64/lib/swift/host/compiler/
+          key: ${{ steps.cache-key.outputs.key }}
+
+      - name: Install Swift toolchain
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          # Install swift.org toolchain to bootstrap swift-syntax build
+          wget -q https://download.swift.org/swift-6.0.3-release/ubuntu2204/swift-6.0.3-RELEASE/swift-6.0.3-RELEASE-ubuntu22.04.tar.gz
+          tar -xzf swift-6.0.3-RELEASE-ubuntu22.04.tar.gz -C /opt
+          echo "/opt/swift-6.0.3-RELEASE-ubuntu22.04/usr/bin" >> $GITHUB_PATH
+
+      - name: Build swift-syntax
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          swift/swift/utils/build-script 
+            --bootstrapping=hosttools 
+            --build-ninja 
+            --release 
+            --only-execute linux-x86_64-swift-build 
+            --skip-build-benchmarks 
+            --build-dir "$BUILD_DIR"
+
+      - name: Upload swift-syntax artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: swift-syntax-linux-x64
+          path: build/swift-linux-x86_64/lib/swift/host/compiler/
+          retention-days: 7
+          if-no-files-found: error
+
+  # ─────────────────────────────────────────────────────────────────
+  # Job 2 — Build Swift compiler (depends on 1a + 1b + 1c)
+  # ─────────────────────────────────────────────────────────────────
+  build-swift:
+    name: Build Swift compiler
+    needs: [build-llvm, build-cmark, build-swift-syntax]
+    runs-on: ubuntu-22.04-32-core
+    timeout-minutes: 240
+
+    steps:
+      - name: Checkout si repo
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Init swift + required submodules
+        run: |
+          git submodule update --init --depth 1 
+            swift/swift 
+            swift/llvm-project 
+            swift/cmark 
+            swift/swift-syntax 
+            swift/swift-driver 
+            swift/swift-argument-parser 
+            swift/swift-tools-support-core 
+            swift/yams 
+            swift/swift-llvm-bindings 
+            swift/swift-format 
+            swift/swift-collections
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends 
+            ninja-build cmake python3 python3-pip 
+            clang lld 
+            libxml2-dev libsqlite3-dev 
+            swig libpython3-dev libncurses-dev 
+            rsync
+
+      - name: Install Swift toolchain (bootstrap)
+        run: |
+          wget -q https://download.swift.org/swift-6.0.3-release/ubuntu2204/swift-6.0.3-RELEASE/swift-6.0.3-RELEASE-ubuntu22.04.tar.gz
+          tar -xzf swift-6.0.3-RELEASE-ubuntu22.04.tar.gz -C /opt
+          echo "/opt/swift-6.0.3-RELEASE-ubuntu22.04/usr/bin" >> $GITHUB_PATH
+
+      - name: Download LLVM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: llvm-linux-x64
+          path: build/llvm-linux-x86_64/
+
+      - name: Download cmark artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: cmark-linux-x64
+          path: build/cmark-linux-x86_64/
+
+      - name: Download swift-syntax artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: swift-syntax-linux-x64
+          path: build/swift-linux-x86_64/lib/swift/host/compiler/
+
+      - name: Restore Swift compiler cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: build/swift-linux-x86_64/
+          key: swift-compiler-linux-x64-${{ hashFiles('swift/swift/.git/HEAD', 'swift/llvm-project/.git/HEAD') }}
+
+      - name: Build Swift compiler (using pre-built LLVM + cmark)
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          swift/swift/utils/build-script 
+            --bootstrapping=hosttools 
+            --build-ninja 
+            --release 
+            --skip-build-benchmarks 
+            --build-llvm=0 
+            --only-execute linux-x86_64-swift-build 
+            --build-dir "$BUILD_DIR"
+
+      - name: Package Swift toolchain
+        run: |
+          mkdir -p toolchain/
+          rsync -a --files-from=- build/swift-linux-x86_64/ toolchain/ <<'EOF'
+          bin/swift-frontend
+          bin/swift
+          bin/swiftc
+          lib/swift/
+          lib/libswift*.so
+          EOF
+
+      - name: Upload Swift toolchain
+        uses: actions/upload-artifact@v4
+        with:
+          name: swift-toolchain-linux-x64
+          path: toolchain/
+          retention-days: 30
+          if-no-files-found: error
+
+  # ─────────────────────────────────────────────────────────────────
+  # Job 3 — Build si (free runner, uses pre-built toolchain)
+  # ─────────────────────────────────────────────────────────────────
+  build-si:
+    name: Build si
+    needs: [build-swift]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout si repo
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Download Swift toolchain
+        uses: actions/download-artifact@v4
+        with:
+          name: swift-toolchain-linux-x64
+          path: /opt/swift-si-toolchain/
+
+      - name: Add toolchain to PATH
+        run: |
+          chmod +x /opt/swift-si-toolchain/bin/*
+          echo "/opt/swift-si-toolchain/bin" >> $GITHUB_PATH
+
+      - name: Build si
+        run: swift build -c release --package-path si/
+
+      - name: Upload si binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: si-linux-x64
+          path: si/.build/release/si
+          retention-days: 30
+          if-no-files-found: error
