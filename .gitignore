@@ -25,3 +25,4 @@ clone-deps.sh
 
 # Internal docs (not for repo)
 *.md
+!README.md
